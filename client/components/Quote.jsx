@@ -1,9 +1,9 @@
 export default function Quote({ quote }) {
-  const { id, text, author, categories } = quote;
-    return (
+  const { id, text, author, categories } = quote
+  return (
     <div
       key={id}
-      className='bg-white p-4 shadow-md rounded-lg dark:bg-gray-800'
+      className='bg-[#faf9fc] p-4 shadow-md rounded-lg dark:bg-gray-800'
     >
       <p className='mb-4 text-lg italic text-gray-900 dark:text-gray-100'>
         "{text}"
