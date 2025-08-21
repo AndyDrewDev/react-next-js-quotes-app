@@ -1,3 +1,4 @@
+import Navbar from '@/components/Navbar'
 import localFont from 'next/font/local'
 import './globals.css'
 
@@ -23,7 +24,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Navbar />
+        <main className='container mx-auto p-4'>{children}</main>
       </body>
     </html>
   )

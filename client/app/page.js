@@ -25,13 +25,10 @@ export default function Home() {
 
   return (
     <div className='p-4'>
-      <h1 className='text-center text-3xl mb-6 dark:text-white'>
-        Quotes Front-end App
-      </h1>
 
       <Button onClick={fetchQuotes} text='Get Random Quotes'/>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+      <div className='pt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
         {quotes.map((quote) => 
           <Quote key={quote.id} quote={quote} />
         )}
