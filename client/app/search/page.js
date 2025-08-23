@@ -24,6 +24,7 @@ export default function SearchPage() {
   const [searchSubmitted, setSearchSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
 
+  const buttonsContainerStyle = 'flex justify-center gap-4'
   const inputsContainerStyle =
     'text-xl flex flex-col md:flex-row justify-center gap-4 md:gap-6 mb-6 mt-10'
   const inputContainerStyle = 'w-full justify-center'
@@ -78,14 +79,25 @@ export default function SearchPage() {
     return newErrors
   }
 
+  const clearInputs = () => {
+    setText('')
+    setAuthor('')
+    setCategory('')
+    setErrors({})
+  }
+
   return (
     <div className='p-4'>
       {/* <h1 className='text-3xl mb-6 text-center dark:text-white'>
         Search Quotes
       </h1> */}
-
-      <div className='text-center'>
-        <Button onClick={handleSearch} text='Search Quotes' />
+      <div className={buttonsContainerStyle}>
+        <div className='text-center'>
+          <Button onClick={handleSearch} text='Search Quotes' />
+        </div>
+        <div className='text-center'>
+          <Button onClick={clearInputs} text='Clear Inputs' variant='secondary' />
+        </div>
       </div>
 
       <div className={inputsContainerStyle}>
@@ -121,7 +133,7 @@ export default function SearchPage() {
             className={inputStyle}
           />
           {errors?.category && (
-            <p className={errorStyle + 'px-5'}>{errors.category}</p>
+            <p className={errorStyle + ' px-5'}>{errors.category}</p>
           )}
         </div>
       </div>
