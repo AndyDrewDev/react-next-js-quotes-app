@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import Button from '@/components/Button'
 import Quote from '@/components/Quote'
 
-const RANDOM_QUOTES_URL = 'http://localhost:3000/quotes/random?limit=10'
+const LIMIT = 9
+const RANDOM_QUOTES_URL = `http://localhost:3000/quotes/random?limit=${LIMIT}`
 
 export default function Home() {
   const [quotes, setQuotes] = useState([])
@@ -16,6 +18,7 @@ export default function Home() {
       setQuotes(data)
     } catch (error) {
       console.error('Error fetching quotes:', error)
+      toast.error(error.message)
     }
   }
 
@@ -25,13 +28,12 @@ export default function Home() {
 
   return (
     <div className='p-4'>
+      <Button onClick={fetchQuotes} text='Get Random Quotes' />
 
-      <Button onClick={fetchQuotes} text='Get Random Quotes'/>
-
-      <div className='pt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {quotes.map((quote) => 
+      <div className='pt-5 grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        {quotes.map((quote) => (
           <Quote key={quote.id} quote={quote} />
-        )}
+        ))}
       </div>
     </div>
   )
