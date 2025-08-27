@@ -42,7 +42,7 @@ const postQuoteValidators = [
 ]
 
 const getRandomQuotesValidators = [
-  query('limit').optional().trim().isInt({ min: 1, max: 20 }),
+  query('limit').optional().trim().isInt({ min: 1, max: 99 }),
 ]
 
 const quoteIdParamValidator = param('id')
