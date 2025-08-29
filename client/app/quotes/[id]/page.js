@@ -9,13 +9,23 @@ export default function QuotePage({ params }) {
   const [quote, setQuote] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const isValidId = (id) => {
+    return !Number.isInteger(Number(id)) || Number(id) <= 0
+  }
+
   const fetchQuote = async () => {
+
+    if (isValidId(id)) {
+        toast.error('Invalid quote ID. ID must be integer greater than 0.')
+        setIsLoading(false)
+        return
+    }
     try {
       const response = await fetch(`http://localhost:3000/quotes/${id}`)
       const data = await response.json()
-      console.log(response)
+
       if (response.status === 404 || response.status === 400) {
-        toast.error(data.message || data.errors[0].msg)  
+        toast.error(data.message || data.errors[0].msg)
         console.log(data.message || data.errors[0].msg)
         return
       }
@@ -23,7 +33,6 @@ export default function QuotePage({ params }) {
       if (response.ok) {
         setQuote(data)
       }
-
     } catch (error) {
       toast.error(error.message)
       console.error('Error fetching quote', error)
@@ -45,7 +54,9 @@ export default function QuotePage({ params }) {
   }
 
   if (!quote) {
-    return <p className='text-center text-3xl mt-10 text-gray-700 dark:text-gray-300'>{`Quote with id:${id} not found.`}</p>
+    return (
+      <p className='text-center text-3xl mt-10 text-gray-700 dark:text-gray-300'>{`Quote with id "${id}" not found.`}</p>
+    )
   }
 
   return (
@@ -55,7 +66,7 @@ export default function QuotePage({ params }) {
       <p>{quote.categories?.join(', ')}</p> */}
       {/* msx-w-4xl */}
       <div className=' w-full mx-auto mt-10 lg:w-3/4 p-6 bg-[#faf9fc] shadow-lg rounded-lg dark:bg-gray-800'>
-        <h2 className='text-2xl text-center mb-6 italic text-gray-900 dark:text-gray-100'>
+        <h2 className='text-xl md:text-2xl text-center mb-6 italic text-gray-900 dark:text-gray-100'>
           {quote.text}
         </h2>
         <p className='text-3xl text-center mb-4 font-semibold text-gray-700 dark:text-gray-300'>

@@ -1,7 +1,12 @@
+import Link from 'next/link'
+
 export default function Quote({ quote }) {
-  const { text, author, categories } = quote
+  const { text, author, categories, id } = quote
   return (
-    <div className='bg-[#faf9fc] p-4 shadow-md rounded-lg dark:bg-gray-800'>
+    <Link
+      href={`/quotes/${id}`}
+      className='bg-[#faf9fc] p-4 shadow-md rounded-lg dark:bg-gray-800 hover:scale-105 hover:bg-violet-100 transition-all duration-300 dark:hover:bg-gray-600'
+    >
       <p className='mb-4 text-lg italic text-gray-900 dark:text-gray-100'>
         "{text}"
       </p>
@@ -18,6 +23,6 @@ export default function Quote({ quote }) {
           </span>
         ))}
       </div>
-    </div>
+    </Link>
   )
 }
