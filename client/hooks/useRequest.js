@@ -1,33 +1,41 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { useRouter } from 'next/navigation'
 
 export const useRequest = ({ path, query }) => {
+  const router = useRouter()
+
   const [searchSubmitted, setSearchSubmitted] = useState(false)
   const [quotes, setQuotes] = useState([])
 
-  const fetchQuotes = async () => {
+  const hasValidationErrors = async (response) => {
+    if (!response.ok) {
+      const errorData = await response.json()
+
+      if (!errorData?.errors || !Array.isArray(errorData?.errors)) {
+        toast.error('Something went wrong')
+        return
+      }
+
+      const fieldErrors = errorData.errors
+        .filter((err) => err.type === 'field')
+        .map((err) => `${err.value}, ${err.path}: ${err.msg}`)
+
+      for (const msg of fieldErrors) {
+        toast.error(msg)
+      }
+      return true
+    }
+  }
+
+  const fetchQuotes = async (nextQuery = query) => {
     try {
       setSearchSubmitted(true)
+      router.push(`?${nextQuery}`)
+      const response = await fetch(`${path}?${nextQuery}`)
 
-      const response = await fetch(`${path}?${query}`)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-
-        if (!errorData?.errors || !Array.isArray(errorData?.errors)) {
-          toast.error('Something went wrong')
-          return
-        }
-
-        const fieldErrors = errorData.errors
-          .filter((err) => err.type === 'field')
-          .map((err) => `${err.value}, ${err.path}: ${err.msg}`)
-
-        for (const msg of fieldErrors) {
-          toast.error(msg)
-        }
-
-        setQuotes([])
+      const hasErrors = await hasValidationErrors(response)
+      if (hasErrors) {
         return
       }
 

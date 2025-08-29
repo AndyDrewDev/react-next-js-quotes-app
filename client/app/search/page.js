@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Button from '@/components/Button'
 import InputField from '@/components/InputField'
 import LimitSelector from '@/components/LimitSelector'
@@ -16,6 +17,9 @@ import {
 const CATEGORY_NAME_REGEX = /^[a-z0-9-]+$/
 
 export default function SearchPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   const [text, setText] = useState('')
   const [author, setAuthor] = useState('')
   const [category, setCategory] = useState('')
@@ -25,6 +29,27 @@ export default function SearchPage() {
   const buttonsContainerStyle = 'flex justify-center gap-4'
   const inputsContainerStyle =
     'text-xl flex flex-col lg:flex-row justify-center gap-4 md:gap-6 mb-6 mt-6'
+
+  useEffect(() => {
+    const initialText = searchParams.get('text') || ''
+    const initialAuthor = searchParams.get('author') || ''
+    const initialCategory = searchParams.get('category') || ''
+    const initialLimit = searchParams.get('limit') || ''
+
+    if (initialText || initialAuthor || initialCategory || initialLimit) {
+      initialText && setText(initialText)
+      initialAuthor && setAuthor(initialAuthor)
+      initialCategory && setCategory(initialCategory)
+      initialLimit && setLimit(initialLimit)
+
+      handleSearch({
+        searchText: initialText,
+        searchAuthor: initialAuthor,
+        searchCategory: initialCategory,
+        searchLimit: initialLimit,
+      })
+    }
+  }, [searchParams])
 
   const validate = () => {
     const newValidationErrors = {}
@@ -52,11 +77,9 @@ export default function SearchPage() {
   }
 
   const path = 'http://localhost:3000/quotes'
-  const query = createQueryString({ text, author, category, limit })
 
-  const { quotes, fetchQuotes, searchSubmitted } = useRequest({
+  const { quotes, fetchQuotes, searchSubmitted, setQuotes } = useRequest({
     path,
-    query,
   })
 
   const inputFields = [
@@ -99,7 +122,12 @@ export default function SearchPage() {
     },
   ]
 
-  const handleSearch = async () => {
+  const handleSearch = async ({
+    searchText = text,
+    searchAuthor = author,
+    searchCategory = category,
+    searchLimit = limit,
+  }) => {
     const errors = validate()
 
     if (Object.keys(errors).length > 0) {
@@ -108,7 +136,13 @@ export default function SearchPage() {
     }
 
     setValidationErrors({})
-    fetchQuotes()
+    const nextQuery = createQueryString({
+      text: searchText,
+      author: searchAuthor,
+      category: searchCategory,
+      limit: searchLimit,
+    })
+    fetchQuotes(nextQuery)
   }
 
   const clearInputs = () => {
@@ -117,6 +151,8 @@ export default function SearchPage() {
     setCategory('')
     setLimit('')
     setValidationErrors({})
+    setQuotes([])
+    router.push('/search')
   }
 
   return (
