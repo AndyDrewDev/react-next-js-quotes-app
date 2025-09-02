@@ -12,6 +12,7 @@ import {
   errorStyle,
   buttonsContainerStyle,
 } from '@/components/styles'
+  import {API_BASE_URL} from '@/config/config'
 
 const CATEGORY_NAME_REGEX = /^[a-z0-9-]+$/
 
@@ -69,7 +70,7 @@ export default function CreateQuotePage() {
         .map((category) => category.trim())
         .filter(Boolean)
 
-      const response = await fetch('http://localhost:3000/quotes', {
+      const response = await fetch(`${API_BASE_URL}/quotes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

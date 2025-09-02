@@ -14,6 +14,7 @@ import {
   errorStyle,
   buttonsContainerStyle,
 } from '@/components/styles'
+import {API_BASE_URL} from '@/config/config'  
 
 const CATEGORY_NAME_REGEX = /^[a-z0-9-]+$/
 
@@ -77,7 +78,7 @@ export default function SearchQuotesPage() {
     return newValidationErrors
   }
 
-  const path = 'http://localhost:3000/quotes'
+  const path = `${API_BASE_URL}/quotes`
 
   const { quotes, fetchQuotes, searchSubmitted, setQuotes, isLoading } =
     useRequest({

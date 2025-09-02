@@ -11,6 +11,7 @@ import {
   inputStyle,
   errorStyle,
 } from '@/components/styles'
+import {API_BASE_URL} from '@/config/config'
 
 export default function RandomQuotesPage() {
   const [limit, setLimit] = useState('')
@@ -28,10 +29,10 @@ export default function RandomQuotesPage() {
     return newValidationErrors
   }
 
-  const path = 'http://localhost:3000/quotes/random'
+  const path = `${API_BASE_URL}/quotes/random`
   const query = createQueryString({ limit })
 
-  const { quotes, fetchQuotes, searchSubmitted } = useRequest({
+  const { quotes, fetchQuotes, searchSubmitted, isLoading } = useRequest({
     path,
     query,
   })
@@ -71,8 +72,11 @@ export default function RandomQuotesPage() {
         error={validationErrors?.limit}
         errorClassName={errorStyle}
       />
-
-      <Quotes quotes={quotes} searchSubmitted={searchSubmitted} />
+      <Quotes
+        quotes={quotes}
+        searchSubmitted={searchSubmitted}
+        isLoading={isLoading}
+      />
     </div>
   )
 }

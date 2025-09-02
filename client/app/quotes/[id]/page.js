@@ -5,6 +5,7 @@ import { ClipLoader } from 'react-spinners'
 import { toast } from 'react-toastify'
 import DeleteIconButton from '@/components/DeleteIconButton'
 import { useRouter } from 'next/navigation'
+import {API_BASE_URL} from '@/config/config'
 
 export default function QuotePage({ params }) {
   const { id } = params
@@ -14,6 +15,8 @@ export default function QuotePage({ params }) {
   const [error, setError] = useState(null)
   const router = useRouter()
 
+  const SINGLE_QUOTE_URL = `${API_BASE_URL}/quotes/${id}`
+
   const isValidId = (id) => {
     return !Number.isInteger(Number(id)) || Number(id) <= 0
   }
@@ -21,7 +24,7 @@ export default function QuotePage({ params }) {
   const handleDeleteQuote = async () => {
     setIsDeleting(true)
     try {
-      const response = await fetch(`http://localhost:3000/quotes/${id}`, {
+      const response = await fetch(SINGLE_QUOTE_URL, {
         method: 'DELETE',
       })
       setIsDeleting(false)
@@ -30,7 +33,7 @@ export default function QuotePage({ params }) {
         toast.success('Quote deleted successfully')
         setTimeout(() => {
           router.push('/')
-        }, 3000)
+        }, 3000)  
       } else if (response.status === 404) {
         toast.error(`Quote with id ${id} not found`)
         const data = await response.json()
@@ -55,7 +58,7 @@ export default function QuotePage({ params }) {
       return
     }
     try {
-      const response = await fetch(`http://localhost:3000/quotes/${id}`)
+          const response = await fetch(SINGLE_QUOTE_URL)  
       const data = await response.json()
 
       if (response.status === 404 || response.status === 400) {
