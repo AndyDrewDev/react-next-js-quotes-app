@@ -9,10 +9,13 @@ const quoteContainerStyle =
 const emptyResponseStyle =
   'pt-10 text-center text-2xl text-gray-600 dark:text-gray-400'
 
+  const buttonsContainerStyle = 'flex justify-center gap-4'
+
 export {
   inputContainerStyle,
   inputStyle,
   errorStyle,
   quoteContainerStyle,
   emptyResponseStyle,
+  buttonsContainerStyle,
 }

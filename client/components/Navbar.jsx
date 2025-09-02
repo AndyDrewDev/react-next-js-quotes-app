@@ -23,6 +23,12 @@ export default function Navbar() {
           >
             Search
           </Link>
+          <Link
+            href='/create'
+            className='text-gray-800 dark:text-white hover:text-gray-600 dark:hover:text-gray-400'
+          >
+            Create
+          </Link>
         </div>
       </div>
     </nav>

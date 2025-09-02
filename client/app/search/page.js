@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Button from '@/components/Button'
 import InputField from '@/components/InputField'
@@ -12,13 +12,15 @@ import {
   inputContainerStyle,
   inputStyle,
   errorStyle,
+  buttonsContainerStyle,
 } from '@/components/styles'
 
 const CATEGORY_NAME_REGEX = /^[a-z0-9-]+$/
 
-export default function SearchPage() {
+export default function SearchQuotesPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const lastQueryRef = useRef('')
 
   const [text, setText] = useState('')
   const [author, setAuthor] = useState('')
@@ -26,7 +28,6 @@ export default function SearchPage() {
   const [limit, setLimit] = useState('')
   const [validationErrors, setValidationErrors] = useState({})
 
-  const buttonsContainerStyle = 'flex justify-center gap-4'
   const inputsContainerStyle =
     'text-xl flex flex-col lg:flex-row justify-center gap-4 md:gap-6 mb-6 mt-6'
 
@@ -78,9 +79,10 @@ export default function SearchPage() {
 
   const path = 'http://localhost:3000/quotes'
 
-  const { quotes, fetchQuotes, searchSubmitted, setQuotes } = useRequest({
-    path,
-  })
+  const { quotes, fetchQuotes, searchSubmitted, setQuotes, isLoading } =
+    useRequest({
+      path,
+    })
 
   const inputFields = [
     {
@@ -127,7 +129,7 @@ export default function SearchPage() {
     searchAuthor = author,
     searchCategory = category,
     searchLimit = limit,
-  }) => {
+  } = {}) => {
     const errors = validate()
 
     if (Object.keys(errors).length > 0) {
@@ -136,12 +138,18 @@ export default function SearchPage() {
     }
 
     setValidationErrors({})
+
     const nextQuery = createQueryString({
       text: searchText,
       author: searchAuthor,
       category: searchCategory,
       limit: searchLimit,
     })
+
+    if (lastQueryRef.current === nextQuery) {
+      return
+    }
+    lastQueryRef.current = nextQuery
     fetchQuotes(nextQuery)
   }
 
@@ -192,7 +200,11 @@ export default function SearchPage() {
         />
       </div>
 
-      <Quotes quotes={quotes} searchSubmitted={searchSubmitted} />
+      <Quotes
+        quotes={quotes}
+        searchSubmitted={searchSubmitted}
+        isLoading={isLoading}
+      />
     </div>
   )
 }

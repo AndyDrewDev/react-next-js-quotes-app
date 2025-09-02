@@ -12,7 +12,7 @@ import {
   errorStyle,
 } from '@/components/styles'
 
-export default function Home() {
+export default function RandomQuotesPage() {
   const [limit, setLimit] = useState('')
   const [validationErrors, setValidationErrors] = useState({})
 

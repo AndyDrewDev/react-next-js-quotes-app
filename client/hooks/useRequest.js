@@ -7,6 +7,7 @@ export const useRequest = ({ path, query }) => {
 
   const [searchSubmitted, setSearchSubmitted] = useState(false)
   const [quotes, setQuotes] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const hasValidationErrors = async (response) => {
     if (!response.ok) {
@@ -30,8 +31,11 @@ export const useRequest = ({ path, query }) => {
 
   const fetchQuotes = async (nextQuery = query) => {
     try {
+      setIsLoading(true)
       setSearchSubmitted(true)
-      router.push(`?${nextQuery}`)
+      if (nextQuery !== query) {
+        router.push(`?${nextQuery}`)
+      }
       const response = await fetch(`${path}?${nextQuery}`)
 
       const hasErrors = await hasValidationErrors(response)
@@ -44,6 +48,8 @@ export const useRequest = ({ path, query }) => {
     } catch (error) {
       console.error('Error fetching quotes:', error)
       toast.error(error.message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -52,5 +58,6 @@ export const useRequest = ({ path, query }) => {
     setQuotes,
     fetchQuotes,
     searchSubmitted,
+    isLoading,
   }
 }
