@@ -12,7 +12,7 @@ export default function Button({ onClick, text, variant = 'primary', disabled = 
   return (
     <div className='text-center m-5'>
       <button onClick={onClick} className={buttonStyle} disabled={disabled}>
-        {text}
+       {text}
       </button>
     </div>
   )

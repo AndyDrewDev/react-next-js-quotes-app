@@ -3,22 +3,56 @@
 import { useEffect, useState } from 'react'
 import { ClipLoader } from 'react-spinners'
 import { toast } from 'react-toastify'
+import DeleteIconButton from '@/components/DeleteIconButton'
+import { useRouter } from 'next/navigation'
 
 export default function QuotePage({ params }) {
   const { id } = params
   const [quote, setQuote] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [error, setError] = useState(null)
+  const router = useRouter()
 
   const isValidId = (id) => {
     return !Number.isInteger(Number(id)) || Number(id) <= 0
   }
 
-  const fetchQuote = async () => {
+  const handleDeleteQuote = async () => {
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`http://localhost:3000/quotes/${id}`, {
+        method: 'DELETE',
+      })
+      setIsDeleting(false)
 
+      if (response.ok) {
+        toast.success('Quote deleted successfully')
+        setTimeout(() => {
+          router.push('/')
+        }, 3000)
+      } else if (response.status === 404) {
+        toast.error(`Quote with id ${id} not found`)
+        const data = await response.json()
+        setError(data.message || data.errors[0].msg)
+      } else {
+        toast.error('Failed to delete quote')
+        setError('Failed to delete quote')
+      }
+    } catch (error) {
+      toast.error(error.message)
+      console.error('Error deleting quote', error)
+      setError(error.message)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const fetchQuote = async () => {
     if (isValidId(id)) {
-        toast.error('Invalid quote ID. ID must be integer greater than 0.')
-        setIsLoading(false)
-        return
+      toast.error('Invalid quote ID. ID must be integer greater than 0.')
+      setIsLoading(false)
+      return
     }
     try {
       const response = await fetch(`http://localhost:3000/quotes/${id}`)
@@ -65,7 +99,14 @@ export default function QuotePage({ params }) {
       <p> — {quote.author}</p>
       <p>{quote.categories?.join(', ')}</p> */}
       {/* msx-w-4xl */}
-      <div className=' w-full mx-auto mt-10 lg:w-3/4 p-6 bg-[#faf9fc] shadow-lg rounded-lg dark:bg-gray-800'>
+      <div className=' w-full mx-auto mt-10 mb-5 lg:w-3/4 p-6 bg-[#faf9fc] shadow-lg rounded-lg dark:bg-gray-800 relative'>
+        <div className='absolute top-4 right-4'>
+          <DeleteIconButton
+            onClick={() => handleDeleteQuote()}
+            disabled={isDeleting}
+            isLoading={isDeleting}
+          />
+        </div>
         <h2 className='text-xl md:text-2xl text-center mb-6 italic text-gray-900 dark:text-gray-100'>
           {quote.text}
         </h2>
