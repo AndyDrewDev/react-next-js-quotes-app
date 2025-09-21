@@ -14,9 +14,8 @@ import {
   errorStyle,
   buttonsContainerStyle,
 } from '@/components/styles'
-import {API_BASE_URL} from '@/config/config'  
-
-const CATEGORY_NAME_REGEX = /^[a-z0-9-]+$/
+import { API_BASE_URL } from '@/config/config'
+import { validateSearch } from '@/utils/validation'
 
 export default function SearchQuotesPage() {
   const router = useRouter()
@@ -53,31 +52,6 @@ export default function SearchQuotesPage() {
     }
   }, [searchParams])
 
-  const validate = () => {
-    const newValidationErrors = {}
-
-    if (text && text.length < 3) {
-      newValidationErrors.text = 'Text must be at least 3 characters long'
-    }
-
-    if (author && author.length < 2) {
-      newValidationErrors.author = 'Author must be at least 2 characters long'
-    }
-
-    if (category && !CATEGORY_NAME_REGEX.test(category)) {
-      newValidationErrors.category =
-        'Category must contain only lowercase letters, numbers and dashes'
-    }
-
-    const limitNum = Number.parseInt(limit, 10) || 9
-    if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > 99) {
-      newValidationErrors.limit = 'Limit must be an integer between 1 and 99'
-    }
-    setValidationErrors(newValidationErrors)
-
-    return newValidationErrors
-  }
-
   const path = `${API_BASE_URL}/quotes`
 
   const { quotes, fetchQuotes, searchSubmitted, setQuotes, isLoading } =
@@ -92,7 +66,8 @@ export default function SearchQuotesPage() {
       placeholder: 'Search by text',
       value: text,
       onChange: (e) => setText(e.target.value),
-      onBlur: validate,
+      onBlur: () =>
+        setValidationErrors(validateSearch({ text, author, category, limit })),
       containerClassName: inputContainerStyle,
       inputClassName: inputStyle,
       error: validationErrors?.text,
@@ -104,7 +79,8 @@ export default function SearchQuotesPage() {
       placeholder: 'Search by author',
       value: author,
       onChange: (e) => setAuthor(e.target.value),
-      onBlur: validate,
+      onBlur: () =>
+        setValidationErrors(validateSearch({ text, author, category, limit })),
       containerClassName: inputContainerStyle,
       inputClassName: inputStyle,
       error: validationErrors?.author,
@@ -117,7 +93,8 @@ export default function SearchQuotesPage() {
       placeholder: 'Search by category',
       value: category,
       onChange: (e) => setCategory(e.target.value),
-      onBlur: validate,
+      onBlur: () =>
+        setValidationErrors(validateSearch({ text, author, category, limit })),
       containerClassName: inputContainerStyle,
       inputClassName: inputStyle,
       error: validationErrors?.category,
@@ -131,7 +108,12 @@ export default function SearchQuotesPage() {
     searchCategory = category,
     searchLimit = limit,
   } = {}) => {
-    const errors = validate()
+    const errors = validateSearch({
+      text: searchText,
+      author: searchAuthor,
+      category: searchCategory,
+      limit: searchLimit,
+    })
 
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors)
@@ -193,7 +175,11 @@ export default function SearchQuotesPage() {
           placeholder='Limit (1-99)'
           value={limit}
           onChange={(e) => setLimit(e.target.value)}
-          onBlur={validate}
+          onBlur={() =>
+            setValidationErrors(
+              validateSearch({ text, author, category, limit })
+            )
+          }
           containerClassName={inputContainerStyle}
           inputClassName={`${inputStyle} w-42 lg:w-36`}
           error={validationErrors?.limit}

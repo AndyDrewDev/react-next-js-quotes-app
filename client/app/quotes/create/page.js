@@ -12,9 +12,8 @@ import {
   errorStyle,
   buttonsContainerStyle,
 } from '@/components/styles'
-  import {API_BASE_URL} from '@/config/config'
-
-const CATEGORY_NAME_REGEX = /^[a-z0-9-]+$/
+import { API_BASE_URL } from '@/config/config'
+import { validateQuoteCreateForm, parseCategories } from '@/utils/validation'
 
 export default function CreateQuotePage() {
   const router = useRouter()
@@ -24,32 +23,13 @@ export default function CreateQuotePage() {
   const [categories, setCategories] = useState('')
   const [validationErrors, setValidationErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
   const validate = () => {
-    const newValidationErrors = {}
-
-    if (text && text.trim().length < 10) {
-      newValidationErrors.text = 'Text must be at least 10 characters long'
-    }
-
-    if (author && (author.trim().length < 2 || author.trim().length > 255)) {
-      newValidationErrors.author = 'Author must be between 2 and 255 characters'
-    }
-
-    const categoryList = categories
-      .split(',')
-      .map((category) => category.trim())
-      .filter(Boolean)
-
-    if (categories && categoryList.length < 1) {
-      newValidationErrors.categories = 'Provide at least one category'
-    } else if (
-      !categoryList.every((category) => CATEGORY_NAME_REGEX.test(category))
-    ) {
-      newValidationErrors.categories =
-        'Categories must contain only lowercase letters, numbers and dashes'
-    }
+    const newValidationErrors = validateQuoteCreateForm({
+      text,
+      author,
+      categoriesStr: categories,
+    })
 
     setValidationErrors(newValidationErrors)
     return newValidationErrors
@@ -65,10 +45,7 @@ export default function CreateQuotePage() {
     setIsSubmitting(true)
 
     try {
-      const categoryList = categories
-        .split(',')
-        .map((category) => category.trim())
-        .filter(Boolean)
+      const categoryList = parseCategories(categories || '')
 
       const response = await fetch(`${API_BASE_URL}/quotes`, {
         method: 'POST',
@@ -108,52 +85,47 @@ export default function CreateQuotePage() {
     }
   }
 
-  const inputs = [
+  const baseField = {
+    type: 'text',
+    containerClassName: inputContainerStyle,
+    inputClassName: inputStyle,
+    errorClassName: errorStyle,
+    onBlur: validate,
+  }
+
+  const inputFields = [
     {
+      ...baseField,
       name: 'text',
-      type: 'text',
       placeholder: 'Quote text (min 10 chars)',
       value: text,
       onChange: (e) => setText(e.target.value),
-      onBlur: validate,
-      containerClassName: inputContainerStyle,
-      inputClassName: inputStyle,
       error: validationErrors?.text,
-      errorClassName: errorStyle,
+      multiline: true,
+      rows: 3,
+      minRows: 4,
     },
     {
+      ...baseField,
       name: 'author',
-      type: 'text',
       placeholder: 'Author (2-255 chars)',
       value: author,
       onChange: (e) => setAuthor(e.target.value),
-      onBlur: validate,
-      containerClassName: inputContainerStyle,
-      inputClassName: inputStyle,
       error: validationErrors?.author,
-      errorClassName: errorStyle,
     },
     {
+      ...baseField,
       name: 'categories',
-      type: 'text',
       placeholder: 'Categories (comma-separated, e.g. life, success)',
       value: categories,
       onChange: (e) => setCategories(e.target.value),
-      onBlur: validate,
-      containerClassName: inputContainerStyle,
-      inputClassName: inputStyle,
       error: validationErrors?.categories,
-      errorClassName: errorStyle,
     },
   ]
 
-  const isFormInvalid =
-    !text.trim() ||
-    text.trim().length < 10 ||
-    !author.trim() ||
-    author.trim().length < 2 ||
-    author.trim().length > 255 ||
-    !categories.trim()
+  const isInputsEmpty = !text.trim() || !author.trim() || !categories.trim()
+  const isHasErrors = Object.keys(validationErrors).length > 0
+  const isFormInvalid = isInputsEmpty || isHasErrors
 
   const clearInputs = () => {
     setText('')
@@ -162,7 +134,7 @@ export default function CreateQuotePage() {
     setValidationErrors({})
   }
 
-  if (isLoading) {
+  if (isSubmitting) {
     return (
       <div className='flex justify-center items-center h-screen'>
         <ClipLoader color='#9333EA' size={80} />
@@ -190,7 +162,7 @@ export default function CreateQuotePage() {
       </div>
 
       <div className='flex flex-col gap-4 max-w-3xl text-xl mx-auto my-6'>
-        {inputs.map((field) => (
+        {inputFields.map((field) => (
           <InputField key={field.name} {...field} />
         ))}
       </div>
