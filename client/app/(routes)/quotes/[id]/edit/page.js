@@ -13,11 +13,7 @@ import {
   parseCategories,
   isValidId,
 } from '@/utils/validation'
-import {
-  inputContainerStyle,
-  inputStyle,
-  errorStyle,
-} from '@/components/styles'
+
 
 export default function EditQuotePage({ params }) {
   const { id } = params
@@ -78,10 +74,13 @@ export default function EditQuotePage({ params }) {
 
   const handleSave = async () => {
     const errors = validate()
+
     if (Object.keys(errors).length > 0) {
       return
     }
+
     setIsSaving(true)
+
     try {
       const categoryList = parseCategories(categories)
 
@@ -94,7 +93,9 @@ export default function EditQuotePage({ params }) {
           categories: categoryList,
         }),
       })
+
       const data = await response.json().catch(() => ({}))
+
       if (!response.ok) {
         if (data?.errors && Array.isArray(data.errors)) {
           data.errors
@@ -109,10 +110,12 @@ export default function EditQuotePage({ params }) {
         }
         return
       }
+
       toast.success('Quote updated successfully')
       if (data?.id) {
         router.push(`/quotes/${data.id}`)
       }
+      
     } catch (error) {
       toast.error(error.message)
       console.error('Error saving quote', error)
@@ -133,21 +136,6 @@ export default function EditQuotePage({ params }) {
     return (
       <p className='text-center text-3xl mt-10 text-gray-700 dark:text-gray-300'>{`Quote with id "${id}" not found.`}</p>
     )
-  }
-
-  const handleChange = (e, name) => {
-    switch (name) {
-      case 'text':
-        setText(e.target.value)
-        break
-      case 'author':
-        setAuthor(e.target.value)
-        break
-      case 'categories':
-        setCategories(e.target.value)
-        break
-    }
-    if (isHasErrors) validate()
   }
 
   const inputFields = getCreateEditInputFields({

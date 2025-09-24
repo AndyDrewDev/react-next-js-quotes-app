@@ -10,9 +10,6 @@ import { getCreateEditInputFields } from '@/app/_config/InputFields'
 import { API_BASE_URL } from '@/config/config'
 import { validateQuoteCreateForm, parseCategories } from '@/utils/validation'
 import {
-  inputContainerStyle,
-  inputStyle,
-  errorStyle,
   buttonsContainerStyle,
 } from '@/components/styles'
 
@@ -78,6 +75,7 @@ export default function CreateQuotePage() {
       if (data?.id) {
         router.push(`/quotes/${data.id}`)
       }
+      
     } catch (error) {
       console.error('Error creating quote:', error)
       toast.error(error.message)
