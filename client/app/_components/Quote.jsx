@@ -8,7 +8,7 @@ export default function Quote({ quote }) {
       className='bg-[#faf9fc] p-4 shadow-md rounded-lg dark:bg-gray-800 hover:scale-[1.03] hover:bg-violet-100 transition-all duration-300 dark:hover:bg-gray-600'
     >
       <p className='mb-4 text-lg italic text-gray-900 dark:text-gray-100'>
-        "{text}"
+        &ldquo;{text}&rdquo;
       </p>
       <p className='mb-10 text-right text-lg font-semibold text-gray-700 dark:text-gray-300'>
         — {author}

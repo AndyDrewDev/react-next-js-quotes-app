@@ -4,7 +4,6 @@ export const isValidId = (id) => {
   return Number.isInteger(Number(id)) && Number(id) > 0
 }
 
-
 export const parseCategories = (categoriesStr) =>
   categoriesStr
     .split(',')
@@ -37,7 +36,7 @@ export const validateSearch = ({ text, author, category, limit }) => {
 
 export const validateQuoteForm = ({ text, author, categoriesStr }) => {
   const errors = {}
-  
+
   if (!text?.trim() || text.trim().length < 10) {
     errors.text = 'Text must be at least 10 characters long'
   }
@@ -59,24 +58,23 @@ export const validateQuoteForm = ({ text, author, categoriesStr }) => {
   }
   return errors
 }
-
 export const validateQuoteCreateForm = ({ text, author, categoriesStr }) => {
-    const errors = {}
-    
-    if (text && text.trim().length < 10) {
-      errors.text = 'Text must be at least 10 characters long'
-    }
-    if (author && (author.trim().length < 2 || author.trim().length > 255)) {
-      errors.author = 'Author must be between 2 and 255 characters'
-    }
-  
-    const list = parseCategories(categoriesStr || '')
-  
-    if (!categoriesStr?.trim() || !list.length) {
-      errors.categories = 'Provide at least one category'
-    } else if (!list.every((category) => CATEGORY_NAME_REGEX.test(category))) {
-      errors.categories =
-        'Categories must contain only lowercase letters, numbers and dashes'
-    }
-    return errors
+  const errors = {}
+
+  if (text && text.trim().length < 10) {
+    errors.text = 'Text must be at least 10 characters long'
   }
+  if (author && (author.trim().length < 2 || author.trim().length > 255)) {
+    errors.author = 'Author must be between 2 and 255 characters'
+  }
+
+  const list = parseCategories(categoriesStr || '')
+
+  if (!categoriesStr?.trim() || !list.length) {
+    errors.categories = 'Provide at least one category'
+  } else if (!list.every((category) => CATEGORY_NAME_REGEX.test(category))) {
+    errors.categories =
+      'Categories must contain only lowercase letters, numbers and dashes'
+  }
+  return errors
+}

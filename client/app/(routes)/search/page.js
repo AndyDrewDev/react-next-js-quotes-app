@@ -6,6 +6,7 @@ import Button from '@/components/Button'
 import InputField from '@/components/InputField'
 import LimitSelector from '@/components/LimitSelector'
 import Quotes from '@/components/Quotes'
+import { getSearchInputFields } from '@/app/_config/InputFields'
 import { createQueryString } from '@/utils/queryParams'
 import { useRequest } from '@/hooks/useRequest'
 import {
@@ -59,48 +60,18 @@ export default function SearchQuotesPage() {
       path,
     })
 
-  const inputFields = [
-    {
-      name: 'text',
-      type: 'text',
-      placeholder: 'Search by text',
-      value: text,
-      onChange: (e) => setText(e.target.value),
-      onBlur: () =>
-        setValidationErrors(validateSearch({ text, author, category, limit })),
-      containerClassName: inputContainerStyle,
-      inputClassName: inputStyle,
-      error: validationErrors?.text,
-      errorClassName: errorStyle,
-    },
-    {
-      name: 'author',
-      type: 'text',
-      placeholder: 'Search by author',
-      value: author,
-      onChange: (e) => setAuthor(e.target.value),
-      onBlur: () =>
-        setValidationErrors(validateSearch({ text, author, category, limit })),
-      containerClassName: inputContainerStyle,
-      inputClassName: inputStyle,
-      error: validationErrors?.author,
-      errorClassName: errorStyle,
-    },
-
-    {
-      name: 'category',
-      type: 'text',
-      placeholder: 'Search by category',
-      value: category,
-      onChange: (e) => setCategory(e.target.value),
-      onBlur: () =>
-        setValidationErrors(validateSearch({ text, author, category, limit })),
-      containerClassName: inputContainerStyle,
-      inputClassName: inputStyle,
-      error: validationErrors?.category,
-      errorClassName: errorStyle + ' px-5',
-    },
-  ]
+  const inputFields = getSearchInputFields({
+    text,
+    author,
+    category,
+    limit,
+    setText,
+    setAuthor,
+    setCategory,
+    validationErrors,
+    setValidationErrors,
+    validateSearch,
+  })
 
   const handleSearch = async ({
     searchText = text,

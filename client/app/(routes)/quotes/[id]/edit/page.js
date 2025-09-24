@@ -6,6 +6,7 @@ import { toast } from 'react-toastify'
 import ClipLoader from 'react-spinners/ClipLoader'
 import InputField from '@/components/InputField'
 import SaveIconButton from '@/components/SaveIconButton'
+import { getCreateEditInputFields } from '@/app/_config/InputFields'
 import { API_BASE_URL } from '@/config/config'
 import {
   validateQuoteForm,
@@ -149,43 +150,16 @@ export default function EditQuotePage({ params }) {
     if (isHasErrors) validate()
   }
 
-  const baseField = {
-    type: 'text',
-    containerClassName: inputContainerStyle,
-    inputClassName: inputStyle,
-    errorClassName: errorStyle,
+  const inputFields = getCreateEditInputFields({
+    text,
+    author,
+    categories,
+    setText,
+    setAuthor,
+    setCategories,
+    validationErrors,
     onBlur: validate,
-  }
-
-  const inputFields = [
-    {
-      ...baseField,
-      name: 'text',
-      placeholder: 'Quote text (min 10 chars)',
-      value: text,
-      onChange: (e) => handleChange(e, 'text'),
-      error: validationErrors?.text,
-      multiline: true,
-      rows: 3,
-      minRows: 4,
-    },
-    {
-      ...baseField,
-      name: 'author',
-      placeholder: 'Author (2-255 chars)',
-      value: author,
-      onChange: (e) => handleChange(e, 'author'),
-      error: validationErrors?.author,
-    },
-    {
-      ...baseField,
-      name: 'categories',
-      placeholder: 'Categories (comma-separated, e.g. life, success)',
-      value: categories,
-      onChange: (e) => handleChange(e, 'categories'),
-      error: validationErrors?.categories,
-    },
-  ]
+  })
 
   const isHasErrors = Object.keys(validationErrors).length > 0
 
