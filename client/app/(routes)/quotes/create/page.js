@@ -2,25 +2,22 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from 'react-toastify'
 import ClipLoader from 'react-spinners/ClipLoader'
 import InputField from '@/components/InputField'
 import Button from '@/components/Button'
 import { getCreateEditInputFields } from '@/app/_config/InputFields'
-import { API_BASE_URL } from '@/config/config'
 import { validateQuoteCreateForm, parseCategories } from '@/utils/validation'
-import {
-  buttonsContainerStyle,
-} from '@/components/styles'
+import { useQuoteActions } from '@/hooks/useQuoteActions'
+import { buttonsContainerStyle } from '@/components/styles'
 
 export default function CreateQuotePage() {
   const router = useRouter()
+  const { createQuote, isLoading } = useQuoteActions()
 
   const [text, setText] = useState('')
   const [author, setAuthor] = useState('')
   const [categories, setCategories] = useState('')
   const [validationErrors, setValidationErrors] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const validate = () => {
     const newValidationErrors = validateQuoteCreateForm({
@@ -40,48 +37,22 @@ export default function CreateQuotePage() {
       return
     }
 
-    setIsSubmitting(true)
-
-    try {
-      const categoryList = parseCategories(categories || '')
-
-      const response = await fetch(`${API_BASE_URL}/quotes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: text.trim(),
-          author: author.trim(),
-          categories: categoryList,
-        }),
-      })
-
-      const data = await response.json().catch(() => ({}))
-
-      if (!response.ok) {
-        if (data?.errors && Array.isArray(data.errors)) {
-          const fieldErrors = data.errors
-            .filter((err) => err.type === 'field')
-            .map((err) => `${err.value}, ${err.path}: ${err.msg}`)
-          fieldErrors.forEach((msg) => toast.error(msg))
-        } else if (data?.message) {
-          toast.error(data.message)
-        } else {
-          toast.error('Failed to create quote')
-        }
-        return
-      }
-
-      toast.success('Quote created successfully')
-      if (data?.id) {
-        router.push(`/quotes/${data.id}`)
-      }
-      
-    } catch (error) {
-      console.error('Error creating quote:', error)
-      toast.error(error.message)
-    } finally {
-      setIsSubmitting(false)
+    const categoryList = parseCategories(categories || '')
+    const quoteData = {
+      text: text.trim(),
+      author: author.trim(),
+      categories: categoryList,
     }
+
+    const result = await createQuote(quoteData, {
+      onSuccess: (data) => {
+        if (data?.id) {
+          router.push(`/quotes/${data.id}`)
+        }
+      },
+    })
+
+    return result.success
   }
 
   const inputFields = getCreateEditInputFields({
@@ -106,7 +77,7 @@ export default function CreateQuotePage() {
     setValidationErrors({})
   }
 
-  if (isSubmitting) {
+  if (isLoading) {
     return (
       <div className='flex justify-center items-center h-screen'>
         <ClipLoader color='#9333EA' size={80} />
@@ -120,8 +91,8 @@ export default function CreateQuotePage() {
         <div className='text-center'>
           <Button
             onClick={handleSubmit}
-            text={isSubmitting ? 'Creating...' : 'Create Quote'}
-            disabled={isSubmitting || isFormInvalid}
+            text={isLoading ? 'Creating...' : 'Create Quote'}
+            disabled={isLoading || isFormInvalid}
           />
         </div>
         <div className='text-center'>

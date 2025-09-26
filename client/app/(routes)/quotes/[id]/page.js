@@ -7,80 +7,51 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DeleteIconButton from '@/components/DeleteIconButton'
 import EditIconButton from '@/components/EditIconButton'
+import { useQuoteActions } from '@/hooks/useQuoteActions'
 import { isValidId } from '@/utils/validation'
-import { API_BASE_URL } from '@/config/config'
 
 export default function QuotePage({ params }) {
   const { id } = params
   const router = useRouter()
-  const SINGLE_QUOTE_URL = `${API_BASE_URL}/quotes/${id}`
+  const { getQuote, deleteQuote, isLoading } = useQuoteActions()
 
+  // Start with loading state to prevent flash of "not found" during SSR
   const [quote, setQuote] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   const handleDeleteQuote = async () => {
-    setIsDeleting(true)
-    try {
-      const response = await fetch(SINGLE_QUOTE_URL, {
-        method: 'DELETE',
-      })
-      setIsDeleting(false)
-
-      if (response.ok) {
-        toast.success('Quote deleted successfully')
+    const result = await deleteQuote(id, {
+      onSuccess: () => {
         setTimeout(() => {
           router.push('/')
         }, 3000)
-      } else if (response.status === 404) {
-        toast.error(`Quote with id ${id} not found`)
-        const data = await response.json()
-        setError(data.message || data.errors[0].msg)
-      } else {
-        toast.error('Failed to delete quote')
-        setError('Failed to delete quote')
-      }
-    } catch (error) {
-      toast.error(error.message)
-      console.error('Error deleting quote', error)
-      setError(error.message)
-    } finally {
-      setIsDeleting(false)
-    }
+      },
+    })
+
+    return result.success
   }
 
   const fetchQuote = async () => {
     if (!isValidId(id)) {
       toast.error('Invalid quote ID. ID must be integer greater than 0.')
-      setIsLoading(false)
       return
     }
-    try {
-      const response = await fetch(SINGLE_QUOTE_URL)
-      const data = await response.json()
 
-      if (response.status === 404 || response.status === 400) {
-        toast.error(data.message || data.errors[0].msg)
-        console.log(data.message || data.errors[0].msg)
-        return
-      }
+    const result = await getQuote(id)
 
-      if (response.ok) {
-        setQuote(data)
-      }
-    } catch (error) {
-      toast.error(error.message)
-      console.error('Error fetching quote', error)
-    } finally {
-      setIsLoading(false)
+    if (result.success) {
+      setQuote(result.data)
     }
   }
 
   useEffect(() => {
+    //to avoid hydration mismatch between server and client
+    setIsClient(true)
     fetchQuote()
-  }, [id])
+  }, [])
 
-  if (isLoading) {
+  // Show loading while API call is in progress or during SSR hydration
+  if (isLoading || !isClient) {
     return (
       <div className='flex justify-center items-center h-screen'>
         <ClipLoader color='#9333EA' size={80} />
@@ -107,8 +78,8 @@ export default function QuotePage({ params }) {
           </Link>
           <DeleteIconButton
             onClick={() => handleDeleteQuote()}
-            disabled={isDeleting}
-            isLoading={isDeleting}
+            disabled={isLoading}
+            isLoading={isLoading}
           />
         </div>
         <h2 className='text-xl md:text-2xl text-center mt-10 pb-6 px-4 md:px-8 italic text-gray-900 dark:text-gray-100'>

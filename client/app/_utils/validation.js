@@ -58,6 +58,7 @@ export const validateQuoteForm = ({ text, author, categoriesStr }) => {
   }
   return errors
 }
+
 export const validateQuoteCreateForm = ({ text, author, categoriesStr }) => {
   const errors = {}
 

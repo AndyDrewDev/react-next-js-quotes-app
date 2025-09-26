@@ -5,13 +5,12 @@ import Button from '@/components/Button'
 import Quotes from '@/components/Quotes'
 import LimitSelector from '@/components/LimitSelector'
 import { createQueryString } from '@/utils/queryParams'
-import { useRequest } from '@/hooks/useRequest'
+import { useQuoteSearch } from '@/hooks/useQuoteSearch'
 import {
   inputContainerStyle,
   inputStyle,
   errorStyle,
 } from '@/components/styles'
-import {API_BASE_URL} from '@/config/config'
 
 export default function RandomQuotesPage() {
   const [limit, setLimit] = useState('')
@@ -29,13 +28,10 @@ export default function RandomQuotesPage() {
     return newValidationErrors
   }
 
-  const path = `${API_BASE_URL}/quotes/random`
   const query = createQueryString({ limit })
 
-  const { quotes, fetchQuotes, searchSubmitted, isLoading } = useRequest({
-    path,
-    query,
-  })
+  const { quotes, fetchRandomQuotes, searchSubmitted, isLoading } =
+    useQuoteSearch({ query })
 
   const handleSearch = async () => {
     const errors = validate()
@@ -46,7 +42,7 @@ export default function RandomQuotesPage() {
     }
 
     setValidationErrors({})
-    fetchQuotes()
+    fetchRandomQuotes()
   }
 
   useEffect(() => {

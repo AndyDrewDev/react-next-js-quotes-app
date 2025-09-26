@@ -7,60 +7,47 @@ import ClipLoader from 'react-spinners/ClipLoader'
 import InputField from '@/components/InputField'
 import SaveIconButton from '@/components/SaveIconButton'
 import { getCreateEditInputFields } from '@/app/_config/InputFields'
-import { API_BASE_URL } from '@/config/config'
+import { useQuoteActions } from '@/hooks/useQuoteActions'
 import {
   validateQuoteForm,
   parseCategories,
   isValidId,
 } from '@/utils/validation'
 
-
 export default function EditQuotePage({ params }) {
   const { id } = params
   const router = useRouter()
-  const SINGLE_QUOTE_URL = `${API_BASE_URL}/quotes/${id}`
+  const { updateQuote, getQuote, isLoading } = useQuoteActions()
 
   const [quote, setQuote] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-
   const [text, setText] = useState('')
   const [author, setAuthor] = useState('')
   const [categories, setCategories] = useState('')
   const [validationErrors, setValidationErrors] = useState(() => ({}))
+  const [isClient, setIsClient] = useState(false)
 
   const fetchQuote = async () => {
     if (!isValidId(id)) {
       toast.error('Invalid quote ID. ID must be integer greater than 0.')
-      setIsLoading(false)
       return
     }
-    try {
-      const response = await fetch(SINGLE_QUOTE_URL)
-      const data = await response.json()
 
-      if (response.status === 404 || response.status === 400) {
-        toast.error(data.message || data.errors[0].msg)
-        return
-      }
+    const result = await getQuote(id)
 
-      if (response.ok) {
-        setQuote(data)
-        setText(data.text)
-        setAuthor(data.author)
-        setCategories(data.categories.join(', '))
-      }
-    } catch (error) {
-      toast.error(error.message)
-      console.error('Error fetching quote', error)
-    } finally {
-      setIsLoading(false)
+    if (result.success) {
+      const data = result.data
+      setQuote(data)
+      setText(data.text)
+      setAuthor(data.author)
+      setCategories(data.categories.join(', '))
     }
   }
 
   useEffect(() => {
+    //to avoid hydration mismatch between server and client
+    setIsClient(true)
     fetchQuote()
-  }, [id])
+  }, [])
 
   const validate = () => {
     const errors = validateQuoteForm({
@@ -79,52 +66,26 @@ export default function EditQuotePage({ params }) {
       return
     }
 
-    setIsSaving(true)
-
-    try {
-      const categoryList = parseCategories(categories)
-
-      const response = await fetch(SINGLE_QUOTE_URL, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: text.trim(),
-          author: author.trim(),
-          categories: categoryList,
-        }),
-      })
-
-      const data = await response.json().catch(() => ({}))
-
-      if (!response.ok) {
-        if (data?.errors && Array.isArray(data.errors)) {
-          data.errors
-            .filter((err) => err.type === 'field')
-            .forEach((err) =>
-              toast.error(`${err.value}, ${err.path}: ${err.msg}`)
-            )
-        } else if (data?.message) {
-          toast.error(data.message)
-        } else {
-          toast.error('Failed to save changes')
-        }
-        return
-      }
-
-      toast.success('Quote updated successfully')
-      if (data?.id) {
-        router.push(`/quotes/${data.id}`)
-      }
-      
-    } catch (error) {
-      toast.error(error.message)
-      console.error('Error saving quote', error)
-    } finally {
-      setIsSaving(false)
+    const categoryList = parseCategories(categories)
+    const quoteData = {
+      text: text.trim(),
+      author: author.trim(),
+      categories: categoryList,
     }
+
+    const result = await updateQuote(id, quoteData, {
+      onSuccess: (data) => {
+        if (data?.id) {
+          router.push(`/quotes/${data.id}`)
+        }
+      },
+    })
+
+    return result.success
   }
 
-  if (isLoading) {
+  // Show loading while API call is in progress or during SSR hydration
+  if (isLoading || !isClient) {
     return (
       <div className='flex justify-center items-center h-screen'>
         <ClipLoader color='#9333EA' size={80} />
@@ -156,8 +117,8 @@ export default function EditQuotePage({ params }) {
       <div className='absolute top-4 right-4'>
         <SaveIconButton
           onClick={handleSave}
-          disabled={isSaving || isHasErrors}
-          isLoading={isSaving}
+          disabled={isLoading || isHasErrors}
+          isLoading={isLoading}
         />
       </div>
 

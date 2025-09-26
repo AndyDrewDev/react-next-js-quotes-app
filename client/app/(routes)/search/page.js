@@ -7,16 +7,15 @@ import InputField from '@/components/InputField'
 import LimitSelector from '@/components/LimitSelector'
 import Quotes from '@/components/Quotes'
 import { getSearchInputFields } from '@/app/_config/InputFields'
+import { useQuoteSearch } from '@/hooks/useQuoteSearch'
 import { createQueryString } from '@/utils/queryParams'
-import { useRequest } from '@/hooks/useRequest'
+import { validateSearch } from '@/utils/validation'
 import {
   inputContainerStyle,
   inputStyle,
   errorStyle,
   buttonsContainerStyle,
 } from '@/components/styles'
-import { API_BASE_URL } from '@/config/config'
-import { validateSearch } from '@/utils/validation'
 
 export default function SearchQuotesPage() {
   const router = useRouter()
@@ -53,12 +52,8 @@ export default function SearchQuotesPage() {
     }
   }, [searchParams])
 
-  const path = `${API_BASE_URL}/quotes`
-
   const { quotes, fetchQuotes, searchSubmitted, setQuotes, isLoading } =
-    useRequest({
-      path,
-    })
+    useQuoteSearch({})
 
   const inputFields = getSearchInputFields({
     text,
