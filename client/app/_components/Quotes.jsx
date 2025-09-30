@@ -2,7 +2,7 @@ import Quote from '@/components/Quote'
 import ClipLoader from 'react-spinners/ClipLoader'
 import { quoteContainerStyle, emptyResponseStyle } from '@/components/styles'
 
-export default function Quotes({ quotes, searchSubmitted = false, isLoading }) {
+export default function Quotes({ quotes, selectedCategory, searchSubmitted = false, isLoading }) {
   if (isLoading) {
     return (
       <div className='flex justify-center items-center pt-10'>
@@ -21,7 +21,7 @@ export default function Quotes({ quotes, searchSubmitted = false, isLoading }) {
   return (
     <div className={quoteContainerStyle}>
       {quotes.map((quote) => (
-        <Quote key={quote.id} quote={quote} />
+        <Quote key={quote.id} quote={quote} selectedCategory={selectedCategory} />
       ))}
     </div>
   )

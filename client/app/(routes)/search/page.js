@@ -38,10 +38,10 @@ export default function SearchQuotesPage() {
     const initialLimit = searchParams.get('limit') || ''
 
     if (initialText || initialAuthor || initialCategory || initialLimit) {
-      initialText && setText(initialText)
-      initialAuthor && setAuthor(initialAuthor)
-      initialCategory && setCategory(initialCategory)
-      initialLimit && setLimit(initialLimit)
+      setText(initialText)
+      setAuthor(initialAuthor)
+      setCategory(initialCategory)
+      setLimit(initialLimit)
 
       handleSearch({
         searchText: initialText,
@@ -155,6 +155,7 @@ export default function SearchQuotesPage() {
 
       <Quotes
         quotes={quotes}
+        selectedCategory={category}
         searchSubmitted={searchSubmitted}
         isLoading={isLoading}
       />
