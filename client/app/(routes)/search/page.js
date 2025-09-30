@@ -43,6 +43,8 @@ export default function SearchQuotesPage() {
       setCategory(initialCategory)
       setLimit(initialLimit)
 
+     // console.log('CALLED')
+
       handleSearch({
         searchText: initialText,
         searchAuthor: initialAuthor,
@@ -106,7 +108,7 @@ export default function SearchQuotesPage() {
     setText('')
     setAuthor('')
     setCategory('')
-    setLimit('')
+    setLimit(9)
     setValidationErrors({})
     setQuotes([])
     router.push('/search')
