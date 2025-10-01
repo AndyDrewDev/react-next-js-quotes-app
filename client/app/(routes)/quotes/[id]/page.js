@@ -5,12 +5,13 @@ import { ClipLoader } from 'react-spinners'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import CategoryTags from '@/app/_components/CategoryTags'
 import DeleteIconButton from '@/components/DeleteIconButton'
 import EditIconButton from '@/components/EditIconButton'
 import { useQuoteActions } from '@/hooks/useQuoteActions'
 import { isValidId } from '@/utils/validation'
 
-export default function QuotePage({ params }) {
+export default function QuotePage({ params, selectedCategory }) {
   const { id } = params
   const router = useRouter()
   const { getQuote, deleteQuote, isLoading } = useQuoteActions()
@@ -88,16 +89,11 @@ export default function QuotePage({ params }) {
         <p className='text-2xl md:text-3xl text-center mb-6 font-semibold text-gray-700 dark:text-gray-300'>
           — {quote.author}
         </p>
-        <div className='flex justify-center gap-3 flex-wrap'>
-          {quote.categories?.map((category) => (
-            <span
-              key={category}
-              className='text-lg bg-violet-900 text-white px-4 py-2 rounded-lg'
-            >
-              {category}
-            </span>
-          ))}
-        </div>
+        <CategoryTags
+          categories={quote.categories}
+          selectedCategory={selectedCategory}
+          isQuotePage={true}
+        />
       </div>
     </div>
   )
