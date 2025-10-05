@@ -158,6 +158,7 @@ export default function SearchQuotesPage() {
       <Quotes
         quotes={quotes}
         selectedCategory={category}
+        searchText={text}
         searchSubmitted={searchSubmitted}
         isLoading={isLoading}
       />

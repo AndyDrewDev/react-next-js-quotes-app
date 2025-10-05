@@ -3,22 +3,27 @@
 import { useEffect, useState } from 'react'
 import { ClipLoader } from 'react-spinners'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import CategoryTags from '@/app/_components/CategoryTags'
 import DeleteIconButton from '@/components/DeleteIconButton'
 import EditIconButton from '@/components/EditIconButton'
 import { useQuoteActions } from '@/hooks/useQuoteActions'
 import { isValidId } from '@/utils/validation'
+import { highlightText } from '@/app/_utils/textHighlight'
 
 export default function QuotePage({ params, selectedCategory }) {
   const { id } = params
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { getQuote, deleteQuote, isLoading } = useQuoteActions()
 
   // Start with loading state to prevent flash of "not found" during SSR
   const [quote, setQuote] = useState(null)
   const [isClient, setIsClient] = useState(false)
+
+  // Get search text from URL parameters
+  const searchText = searchParams?.get('searchText') || ''
 
   const handleDeleteQuote = async () => {
     const result = await deleteQuote(id, {
@@ -84,11 +89,23 @@ export default function QuotePage({ params, selectedCategory }) {
           />
         </div>
         <h2 className='text-xl md:text-2xl text-center mt-10 pb-6 px-4 md:px-8 italic text-gray-900 dark:text-gray-100'>
-          {quote.text}
+          {highlightText(quote.text, searchText)}
         </h2>
         <p className='flex justify-center'>
-          <Link className='text-2xl md:text-3xl mb-6 font-semibold text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-500' href={`/search?author=${quote.author}`}> — {quote.author}</Link>
-        </p>    
+          <Link
+            className='text-2xl md:text-3xl mb-6 font-semibold text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-500'
+            href={
+              searchText
+                ? `/search?author=${quote.author}&text=${encodeURIComponent(
+                    searchText
+                  )}`
+                : `/search?author=${quote.author}`
+            }
+          >
+            {' '}
+            — {quote.author}
+          </Link>
+        </p>
         <CategoryTags
           categories={quote.categories}
           selectedCategory={selectedCategory}
