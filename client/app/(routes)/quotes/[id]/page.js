@@ -86,9 +86,9 @@ export default function QuotePage({ params, selectedCategory }) {
         <h2 className='text-xl md:text-2xl text-center mt-10 pb-6 px-4 md:px-8 italic text-gray-900 dark:text-gray-100'>
           {quote.text}
         </h2>
-        <p className='text-2xl md:text-3xl text-center mb-6 font-semibold text-gray-700 dark:text-gray-300'>
-          — {quote.author}
-        </p>
+        <p className='flex justify-center'>
+          <Link className='text-2xl md:text-3xl mb-6 font-semibold text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-500' href={`/search?author=${quote.author}`}> — {quote.author}</Link>
+        </p>    
         <CategoryTags
           categories={quote.categories}
           selectedCategory={selectedCategory}

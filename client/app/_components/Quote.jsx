@@ -15,8 +15,9 @@ export default function Quote({ quote, selectedCategory }) {
             : text}
           &rdquo;
         </p>
-        <p className='mb-10 text-right text-lg font-semibold text-gray-700 dark:text-gray-300'>
-          — {author}
+
+        <p className='flex justify-end pb-10'>
+          <Link href={`/search?author=${author}` } className='text-lg font-semibold text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-500'> — {author}</Link>
         </p>
       </Link>
 
