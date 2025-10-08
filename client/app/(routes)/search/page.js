@@ -10,6 +10,7 @@ import { getSearchInputFields } from '@/app/_config/InputFields'
 import { useQuoteSearch } from '@/hooks/useQuoteSearch'
 import { createQueryString } from '@/utils/queryParams'
 import { validateSearch } from '@/utils/validation'
+import { INITIAL_SEARCH_DATA } from '@/utils/constants'
 import {
   inputContainerStyle,
   inputStyle,
@@ -22,10 +23,7 @@ export default function SearchQuotesPage() {
   const searchParams = useSearchParams()
   const lastQueryRef = useRef('')
 
-  const [text, setText] = useState('')
-  const [author, setAuthor] = useState('')
-  const [category, setCategory] = useState('')
-  const [limit, setLimit] = useState('')
+  const [formData, setFormData] = useState(INITIAL_SEARCH_DATA)
   const [validationErrors, setValidationErrors] = useState({})
 
   const inputsContainerStyle =
@@ -38,12 +36,12 @@ export default function SearchQuotesPage() {
     const initialLimit = searchParams.get('limit') || ''
 
     if (initialText || initialAuthor || initialCategory || initialLimit) {
-      setText(initialText)
-      setAuthor(initialAuthor)
-      setCategory(initialCategory)
-      setLimit(initialLimit)
+      setFormData({ ...formData, text: initialText })
+      setFormData({ ...formData, author: initialAuthor })
+      setFormData({ ...formData, category: initialCategory })
+      setFormData({ ...formData, limit: initialLimit })
 
-     // console.log('CALLED')
+      // console.log('CALLED')
 
       handleSearch({
         searchText: initialText,
@@ -58,29 +56,26 @@ export default function SearchQuotesPage() {
     useQuoteSearch({})
 
   const inputFields = getSearchInputFields({
-    text,
-    author,
-    category,
-    limit,
-    setText,
-    setAuthor,
-    setCategory,
+    formData,
+    setFormData,
     validationErrors,
     setValidationErrors,
     validateSearch,
   })
 
   const handleSearch = async ({
-    searchText = text,
-    searchAuthor = author,
-    searchCategory = category,
-    searchLimit = limit,
+    searchText = formData.text,
+    searchAuthor = formData.author,
+    searchCategory = formData.category,
+    searchLimit = formData.limit,
   } = {}) => {
     const errors = validateSearch({
-      text: searchText,
-      author: searchAuthor,
-      category: searchCategory,
-      limit: searchLimit,
+      formData: {
+        text: searchText,
+        author: searchAuthor,
+        category: searchCategory,
+        limit: searchLimit,
+      },
     })
 
     if (Object.keys(errors).length > 0) {
@@ -91,10 +86,12 @@ export default function SearchQuotesPage() {
     setValidationErrors({})
 
     const nextQuery = createQueryString({
-      text: searchText,
-      author: searchAuthor,
-      category: searchCategory,
-      limit: searchLimit,
+      formData: {
+        text: searchText,
+        author: searchAuthor,
+        category: searchCategory,
+        limit: searchLimit,
+      },
     })
 
     if (lastQueryRef.current === nextQuery) {
@@ -105,10 +102,7 @@ export default function SearchQuotesPage() {
   }
 
   const clearInputs = () => {
-    setText('')
-    setAuthor('')
-    setCategory('')
-    setLimit(9)
+    setFormData({ ...formData, text: '', author: '', category: '', limit: 9 })
     setValidationErrors({})
     setQuotes([])
     router.push('/search')
@@ -141,11 +135,16 @@ export default function SearchQuotesPage() {
           name='limit'
           type='number'
           placeholder='Limit (1-99)'
-          value={limit}
-          onChange={(e) => setLimit(e.target.value)}
+          value={formData.limit}
+          onChange={(e) => setFormData({ ...formData, limit: e.target.value })}
           onBlur={() =>
             setValidationErrors(
-              validateSearch({ text, author, category, limit })
+              validateSearch({
+                text: formData.text,
+                author: formData.author,
+                category: formData.category,
+                limit: formData.limit,
+              })
             )
           }
           containerClassName={inputContainerStyle}
@@ -157,8 +156,8 @@ export default function SearchQuotesPage() {
 
       <Quotes
         quotes={quotes}
-        selectedCategory={category}
-        searchText={text}
+        selectedCategory={formData.category}
+        searchText={formData.text}
         searchSubmitted={searchSubmitted}
         isLoading={isLoading}
       />

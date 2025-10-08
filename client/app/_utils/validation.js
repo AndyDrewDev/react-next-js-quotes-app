@@ -17,7 +17,8 @@ export const validateLimit = (limit, { min = 1, max = 99 } = {}) => {
   }
 }
 
-export const validateSearch = ({ text, author, category, limit }) => {
+export const validateSearch = ({ formData }) => {
+  const { text, author, category, limit } = formData
   const errors = {}
 
   if (text && text.length < 3)
@@ -34,7 +35,8 @@ export const validateSearch = ({ text, author, category, limit }) => {
   return errors
 }
 
-export const validateQuoteForm = ({ text, author, categoriesStr }) => {
+export const validateQuoteForm = ({ formData }) => {
+  const { text, author, categoriesStr } = formData
   const errors = {}
 
   if (!text?.trim() || text.trim().length < 10) {
@@ -59,7 +61,8 @@ export const validateQuoteForm = ({ text, author, categoriesStr }) => {
   return errors
 }
 
-export const validateQuoteCreateForm = ({ text, author, categoriesStr }) => {
+export const validateQuoteCreateForm = ({ formData }) => {
+  const { text, author, categoriesStr } = formData
   const errors = {}
 
   if (text && text.trim().length < 10) {
