@@ -7,6 +7,7 @@ import InputField from '@/components/InputField'
 import Button from '@/components/Button'
 import { getCreateEditInputFields } from '@/app/_config/InputFields'
 import { validateQuoteCreateForm, parseCategories } from '@/utils/validation'
+import { INITIAL_FORM_DATA } from '@/utils/constants'
 import { useQuoteActions } from '@/hooks/useQuoteActions'
 import { buttonsContainerStyle } from '@/components/styles'
 
@@ -14,16 +15,12 @@ export default function CreateQuotePage() {
   const router = useRouter()
   const { createQuote, isLoading } = useQuoteActions()
 
-  const [text, setText] = useState('')
-  const [author, setAuthor] = useState('')
-  const [categories, setCategories] = useState('')
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [validationErrors, setValidationErrors] = useState({})
 
   const validate = () => {
     const newValidationErrors = validateQuoteCreateForm({
-      text,
-      author,
-      categoriesStr: categories,
+      formData,
     })
 
     setValidationErrors(newValidationErrors)
@@ -37,10 +34,10 @@ export default function CreateQuotePage() {
       return
     }
 
-    const categoryList = parseCategories(categories || '')
+    const categoryList = parseCategories(formData.categories || '')
     const quoteData = {
-      text: text.trim(),
-      author: author.trim(),
+      text: formData.text.trim(),
+      author: formData.author.trim(),
       categories: categoryList,
     }
 
@@ -56,24 +53,21 @@ export default function CreateQuotePage() {
   }
 
   const inputFields = getCreateEditInputFields({
-    text,
-    author,
-    categories,
-    setText,
-    setAuthor,
-    setCategories,
+    formData,
+    setFormData,
     validationErrors,
     onBlur: validate,
   })
 
-  const isInputsEmpty = !text.trim() || !author.trim() || !categories.trim()
+  const isInputsEmpty =
+    !formData.text.trim() ||
+    !formData.author.trim() ||
+    !formData.categories.trim()
   const isHasErrors = Object.keys(validationErrors).length > 0
   const isFormInvalid = isInputsEmpty || isHasErrors
 
   const clearInputs = () => {
-    setText('')
-    setAuthor('')
-    setCategories('')
+    setFormData(INITIAL_FORM_DATA)
     setValidationErrors({})
   }
 

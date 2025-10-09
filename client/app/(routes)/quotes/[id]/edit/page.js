@@ -13,6 +13,7 @@ import {
   parseCategories,
   isValidId,
 } from '@/utils/validation'
+import { INITIAL_FORM_DATA } from '@/utils/constants'
 
 export default function EditQuotePage({ params }) {
   const { id } = params
@@ -20,9 +21,7 @@ export default function EditQuotePage({ params }) {
   const { updateQuote, getQuote, isLoading } = useQuoteActions()
 
   const [quote, setQuote] = useState(null)
-  const [text, setText] = useState('')
-  const [author, setAuthor] = useState('')
-  const [categories, setCategories] = useState('')
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [validationErrors, setValidationErrors] = useState(() => ({}))
   const [isClient, setIsClient] = useState(false)
 
@@ -37,9 +36,11 @@ export default function EditQuotePage({ params }) {
     if (result.success) {
       const data = result.data
       setQuote(data)
-      setText(data.text)
-      setAuthor(data.author)
-      setCategories(data.categories.join(', '))
+      setFormData({
+        text: data.text,
+        author: data.author,
+        categories: data.categories.join(', '),
+      })
     }
   }
 
@@ -51,9 +52,7 @@ export default function EditQuotePage({ params }) {
 
   const validate = () => {
     const errors = validateQuoteForm({
-      text: text.trim(),
-      author: author.trim(),
-      categoriesStr: categories,
+      formData,
     })
     setValidationErrors(errors)
     return errors
@@ -66,10 +65,10 @@ export default function EditQuotePage({ params }) {
       return
     }
 
-    const categoryList = parseCategories(categories)
+    const categoryList = parseCategories(formData.categories)
     const quoteData = {
-      text: text.trim(),
-      author: author.trim(),
+      text: formData.text.trim(),
+      author: formData.author.trim(),
       categories: categoryList,
     }
 
@@ -100,12 +99,8 @@ export default function EditQuotePage({ params }) {
   }
 
   const inputFields = getCreateEditInputFields({
-    text,
-    author,
-    categories,
-    setText,
-    setAuthor,
-    setCategories,
+    formData,
+    setFormData,
     validationErrors,
     onBlur: validate,
   })
@@ -113,7 +108,7 @@ export default function EditQuotePage({ params }) {
   const isHasErrors = Object.keys(validationErrors).length > 0
 
   return (
-    <div className=' w-full mx-auto mt-10 mb-5 lg:w-3/4 py-10 bg-[#faf9fc] shadow-lg rounded-lg dark:bg-gray-800 relative'>
+    <div className='w-full mx-auto mt-10 mb-5 lg:w-3/4 py-10 bg-[#faf9fc] shadow-lg rounded-lg dark:bg-gray-800 relative'>
       <div className='absolute top-4 right-4'>
         <SaveIconButton
           onClick={handleSave}

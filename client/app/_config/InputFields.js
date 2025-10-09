@@ -13,12 +13,8 @@ const baseField = {
 
 // Common fields for Create/Edit forms
 export const getCreateEditInputFields = ({
-  text,
-  author,
-  categories,
-  setText,
-  setAuthor,
-  setCategories,
+  formData,
+  setFormData,
   validationErrors,
   onBlur,
 }) => [
@@ -26,8 +22,8 @@ export const getCreateEditInputFields = ({
     ...baseField,
     name: 'text',
     placeholder: 'Quote text (min 10 chars)',
-    value: text,
-    onChange: (e) => setText(e.target.value),
+    value: formData.text,
+    onChange: (e) => setFormData({ ...formData, text: e.target.value }),
     error: validationErrors?.text,
     multiline: true,
     rows: 3,
@@ -38,8 +34,8 @@ export const getCreateEditInputFields = ({
     ...baseField,
     name: 'author',
     placeholder: 'Author (2-255 chars)',
-    value: author,
-    onChange: (e) => setAuthor(e.target.value),
+    value: formData.author,
+    onChange: (e) => setFormData({ ...formData, author: e.target.value }),
     error: validationErrors?.author,
     onBlur,
   },
@@ -47,8 +43,8 @@ export const getCreateEditInputFields = ({
     ...baseField,
     name: 'categories',
     placeholder: 'Categories (comma-separated, e.g. life, success)',
-    value: categories,
-    onChange: (e) => setCategories(e.target.value),
+    value: formData.categories,
+    onChange: (e) => setFormData({ ...formData, categories: e.target.value }),
     error: validationErrors?.categories,
     onBlur,
   },
@@ -56,13 +52,8 @@ export const getCreateEditInputFields = ({
 
 // Fields for Search form
 export const getSearchInputFields = ({
-  text,
-  author,
-  category,
-  limit,
-  setText,
-  setAuthor,
-  setCategory,
+  formData,
+  setFormData,
   validationErrors,
   setValidationErrors,
   validateSearch,
@@ -71,31 +62,52 @@ export const getSearchInputFields = ({
     ...baseField,
     name: 'text',
     placeholder: 'Search by text',
-    value: text,
-    onChange: (e) => setText(e.target.value),
+    value: formData.text,
+    onChange: (e) => setFormData({ ...formData, text: e.target.value }),
     error: validationErrors?.text,
     onBlur: () =>
-      setValidationErrors(validateSearch({ text, author, category, limit })),
+      setValidationErrors(
+        validateSearch({
+          text: formData.text,
+          author: formData.author,
+          category: formData.category,
+          limit: formData.limit,
+        })
+      ),
   },
   {
     ...baseField,
     name: 'author',
     placeholder: 'Search by author',
-    value: author,
-    onChange: (e) => setAuthor(e.target.value),
+    value: formData.author,
+    onChange: (e) => setFormData({ ...formData, author: e.target.value }),
     error: validationErrors?.author,
     onBlur: () =>
-      setValidationErrors(validateSearch({ text, author, category, limit })),
+      setValidationErrors(
+        validateSearch({
+          text: formData.text,
+          author: formData.author,
+          category: formData.category,
+          limit: formData.limit,
+        })
+      ),
   },
   {
     ...baseField,
     name: 'category',
     placeholder: 'Search by category',
-    value: category,
-    onChange: (e) => setCategory(e.target.value),
+    value: formData.category,
+    onChange: (e) => setFormData({ ...formData, category: e.target.value }),
     error: validationErrors?.category,
     onBlur: () =>
-      setValidationErrors(validateSearch({ text, author, category, limit })),
+      setValidationErrors(
+        validateSearch({
+          text: formData.text,
+          author: formData.author,
+          category: formData.category,
+          limit: formData.limit,
+        })
+      ),
     errorClassName: baseField.errorClassName + ' px-5',
   },
 ]
