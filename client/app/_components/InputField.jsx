@@ -1,4 +1,5 @@
 export default function InputField({
+  name,
   type = 'text',
   placeholder,
   value,
@@ -18,6 +19,7 @@ export default function InputField({
     <div className={containerClassName}>
       {multiline ? (
         <textarea
+          name={name}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
@@ -29,6 +31,7 @@ export default function InputField({
       ) : (
         <input
           type={type}
+          name={name}
           placeholder={placeholder}
           value={value}
           onChange={onChange}

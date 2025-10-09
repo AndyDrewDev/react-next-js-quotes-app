@@ -36,7 +36,7 @@ export const validateSearch = ({ formData }) => {
 }
 
 export const validateQuoteForm = ({ formData }) => {
-  const { text, author, categoriesStr } = formData
+  const { text, author, categories } = formData
   const errors = {}
 
   if (!text?.trim() || text.trim().length < 10) {
@@ -50,9 +50,9 @@ export const validateQuoteForm = ({ formData }) => {
     errors.author = 'Author must be between 2 and 255 characters'
   }
 
-  const list = parseCategories(categoriesStr || '')
+  const list = parseCategories(categories || '')
 
-  if (!categoriesStr?.trim() || !list.length) {
+  if (!categories?.trim() || !list.length) {
     errors.categories = 'Provide at least one category'
   } else if (!list.every((category) => CATEGORY_NAME_REGEX.test(category))) {
     errors.categories =
@@ -62,7 +62,7 @@ export const validateQuoteForm = ({ formData }) => {
 }
 
 export const validateQuoteCreateForm = ({ formData }) => {
-  const { text, author, categoriesStr } = formData
+  const { text, author, categories } = formData
   const errors = {}
 
   if (text && text.trim().length < 10) {
@@ -72,9 +72,9 @@ export const validateQuoteCreateForm = ({ formData }) => {
     errors.author = 'Author must be between 2 and 255 characters'
   }
 
-  const list = parseCategories(categoriesStr || '')
+  const list = parseCategories(categories || '')
 
-  if (!categoriesStr?.trim() || !list.length) {
+  if (categories && (!categories?.trim() || !list.length)) {
     errors.categories = 'Provide at least one category'
   } else if (!list.every((category) => CATEGORY_NAME_REGEX.test(category))) {
     errors.categories =
