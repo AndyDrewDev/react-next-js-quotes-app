@@ -16,14 +16,18 @@ export const useQuoteSearch = ({ query }) => {
       setIsLoading(true)
       setSearchSubmitted(true)
 
-      if (nextQuery !== query) {
-        router.push(`?${nextQuery}`)
-      }
-
       const result = await apiMethod(nextQuery)
 
       if (result.success) {
         setQuotes(Array.isArray(result.data) ? result.data : [])
+      }
+
+      if (nextQuery !== query) {
+        if (searchSubmitted || nextQuery.includes('&')) {
+          router.push(`?${nextQuery}`)
+        } else {
+          router.replace(`?${nextQuery}`)
+        }
       }
     } catch (error) {
       console.error('Error fetching quotes:', error)
@@ -33,7 +37,7 @@ export const useQuoteSearch = ({ query }) => {
   }
 
   const fetchQuotes = (nextQuery) => fetchQuotesBase(quoteAPI.getAll, nextQuery)
-  
+
   const fetchRandomQuotes = (nextQuery) =>
     fetchQuotesBase(quoteAPI.getRandom, nextQuery)
 

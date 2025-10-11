@@ -14,7 +14,7 @@ export default function Quote({ quote, searchText, selectedCategory }) {
 
   return (
     <div className='bg-[#faf9fc] p-4 shadow-md rounded-lg dark:bg-gray-800 hover:scale-[1.03] hover:bg-violet-100 transition-all duration-300 dark:hover:bg-gray-600'>
-      <Link href={quoteUrl}>
+      <Link href={quoteUrl} className='block'>
         <p className='mb-4 text-lg italic text-gray-900 dark:text-gray-100'>
           &ldquo;
           {text.length > MAX_VISIBLE_LENGTH
@@ -25,23 +25,23 @@ export default function Quote({ quote, searchText, selectedCategory }) {
             : highlightText(text, searchText)}
           &rdquo;
         </p>
-
-        <p className='flex justify-end pb-10'>
-          <Link
-            href={
-              searchText
-                ? `/search?author=${author}&text=${encodeURIComponent(
-                    searchText
-                  )}`
-                : `/search?author=${author}`
-            }
-            className='text-lg font-semibold text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-500'
-          >
-            {' '}
-            — {author}
-          </Link>
-        </p>
       </Link>
+
+      <p className='flex justify-end pb-10'>
+        <Link
+          href={
+            searchText
+              ? `/search?author=${author}&text=${encodeURIComponent(
+                  searchText
+                )}`
+              : `/search?author=${author}`
+          }
+          className='text-lg font-semibold text-gray-700 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-500'
+        >
+          {' '}
+          — {author}
+        </Link>
+      </p>
 
       <CategoryTags
         categories={categories}

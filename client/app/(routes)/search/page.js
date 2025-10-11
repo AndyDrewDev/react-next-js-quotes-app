@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Button from '@/components/Button'
 import InputField from '@/components/InputField'
 import LimitSelector from '@/components/LimitSelector'
@@ -19,7 +19,6 @@ import {
 } from '@/components/styles'
 
 export default function SearchQuotesPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const lastQueryRef = useRef('')
 
@@ -35,25 +34,23 @@ export default function SearchQuotesPage() {
     const initialCategory = searchParams.get('category') || ''
     const initialLimit = searchParams.get('limit') || ''
 
-    if (initialText || initialAuthor || initialCategory || initialLimit) {
-      setFormData({ ...formData, text: initialText })
-      setFormData({ ...formData, author: initialAuthor })
-      setFormData({ ...formData, category: initialCategory })
-      setFormData({ ...formData, limit: initialLimit })
+    setFormData((prev) => ({
+      ...prev,
+      text: initialText,
+      author: initialAuthor,
+      category: initialCategory,
+      limit: initialLimit,
+    }))
 
-      // console.log('CALLED')
-
-      handleSearch({
-        searchText: initialText,
-        searchAuthor: initialAuthor,
-        searchCategory: initialCategory,
-        searchLimit: initialLimit,
-      })
-    }
+    handleSearch({
+      searchText: initialText,
+      searchAuthor: initialAuthor,
+      searchCategory: initialCategory,
+      searchLimit: initialLimit,
+    })
   }, [searchParams])
 
-  const { quotes, fetchQuotes, searchSubmitted, setQuotes, isLoading } =
-    useQuoteSearch({})
+  const { quotes, fetchQuotes, searchSubmitted, isLoading } = useQuoteSearch({})
 
   const inputFields = getSearchInputFields({
     formData,
@@ -104,15 +101,10 @@ export default function SearchQuotesPage() {
   const clearInputs = () => {
     setFormData({ ...formData, text: '', author: '', category: '', limit: 9 })
     setValidationErrors({})
-    setQuotes([])
-    router.push('/search')
   }
 
   return (
     <div className='p-4'>
-      {/* <h1 className='text-3xl mb-6 text-center dark:text-white'>
-        Search Quotes
-      </h1> */}
       <div className={buttonsContainerStyle}>
         <div className='text-center'>
           <Button onClick={handleSearch} text='Search Quotes' />
@@ -137,16 +129,7 @@ export default function SearchQuotesPage() {
           placeholder='Limit (1-99)'
           value={formData.limit}
           onChange={(e) => setFormData({ ...formData, limit: e.target.value })}
-          onBlur={() =>
-            setValidationErrors(
-              validateSearch({
-                text: formData.text,
-                author: formData.author,
-                category: formData.category,
-                limit: formData.limit,
-              })
-            )
-          }
+          onBlur={() => setValidationErrors(validateSearch({ formData }))}
           containerClassName={inputContainerStyle}
           inputClassName={`${inputStyle} w-42 lg:w-36`}
           error={validationErrors?.limit}

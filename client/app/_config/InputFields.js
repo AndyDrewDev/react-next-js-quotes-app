@@ -66,7 +66,7 @@ export const getSearchInputFields = ({
   validateSearch,
 }) => {
   const onChangeHandler = (e) => setFormDataHandler(e, formData, setFormData)
-  const onBlurHandler = () => setValidationErrors(validateSearch({ ...formData }))
+  const onBlurHandler = () => setValidationErrors(validateSearch({ formData }))
 
   return [
     {
