@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import ClipLoader from 'react-spinners/ClipLoader'
+import { ClipLoader } from 'react-spinners'
 import Button from '@/components/Button'
 import Quotes from '@/components/Quotes'
 import LimitSelector from '@/components/LimitSelector'

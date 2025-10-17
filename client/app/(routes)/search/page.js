@@ -29,25 +29,16 @@ export default function SearchQuotesPage() {
     'text-xl flex flex-col lg:flex-row justify-center gap-4 md:gap-6 mb-6 mt-6'
 
   useEffect(() => {
-    const initialText = searchParams.get('text') || ''
-    const initialAuthor = searchParams.get('author') || ''
-    const initialCategory = searchParams.get('category') || ''
-    const initialLimit = searchParams.get('limit') || ''
+    const searchDataFromQueryString = {
+      text: searchParams.get('text') || '',
+      author: searchParams.get('author') || '',
+      category: searchParams.get('category') || '',
+      limit: searchParams.get('limit') || '',
+    }
 
-    setFormData((prev) => ({
-      ...prev,
-      text: initialText,
-      author: initialAuthor,
-      category: initialCategory,
-      limit: initialLimit,
-    }))
+    setFormData(searchDataFromQueryString)
 
-    handleSearch({
-      searchText: initialText,
-      searchAuthor: initialAuthor,
-      searchCategory: initialCategory,
-      searchLimit: initialLimit,
-    })
+    handleSearch({ searchData: searchDataFromQueryString })
   }, [searchParams])
 
   const { quotes, fetchQuotes, searchSubmitted, isLoading } = useQuoteSearch({})
@@ -60,18 +51,10 @@ export default function SearchQuotesPage() {
     validateSearch,
   })
 
-  const handleSearch = async ({
-    searchText = formData.text,
-    searchAuthor = formData.author,
-    searchCategory = formData.category,
-    searchLimit = formData.limit,
-  } = {}) => {
+  const handleSearch = async ({ searchData = formData } = {}) => {
     const errors = validateSearch({
       formData: {
-        text: searchText,
-        author: searchAuthor,
-        category: searchCategory,
-        limit: searchLimit,
+        ...searchData,
       },
     })
 
@@ -84,10 +67,7 @@ export default function SearchQuotesPage() {
 
     const nextQuery = createQueryString({
       formData: {
-        text: searchText,
-        author: searchAuthor,
-        category: searchCategory,
-        limit: searchLimit,
+        ...searchData,
       },
     })
 
@@ -99,7 +79,7 @@ export default function SearchQuotesPage() {
   }
 
   const clearInputs = () => {
-    setFormData({ ...formData, text: '', author: '', category: '', limit: 9 })
+    setFormData({ ...INITIAL_SEARCH_DATA, limit: 9 })
     setValidationErrors({})
   }
 
