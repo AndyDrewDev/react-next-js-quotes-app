@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Client (Next.js) – Quotes App
 
-## Getting Started
+### Overview
 
-First, run the development server:
+Next.js 14 + React 18 client for browsing, searching, creating, editing, and deleting quotes. Communicates with the API server documented in the root `README.md`.
+
+### Requirements
+
+- Node.js (LTS) and npm
+- Running API server (see `../README.md`)
+
+### Environment variables
+
+Create `client/.env.local`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
-Open [http://localhost:4000](http://localhost:4000) with your browser to see the result.
+`NEXT_PUBLIC_API_URL` config is read in `app/_config/config.js` and used by the request helper in `app/_utils/apiClient.js`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Getting started (development)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:4000](http://localhost:4000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+### Available scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev`: start Next.js dev server on port 4000
+- `npm run build`: build the app for production
+- `npm start`: start the production server
+- `npm run lint`: run linting
+- `npm test`: run unit tests (Jest + React Testing Library)
+- `npm run test:watch`: run tests in watch mode
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Production
 
-## Deploy on Vercel
+```bash
+npm install
+npm run build
+npm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Set `NEXT_PUBLIC_API_URL` to your API’s public URL via environment variables on your hosting provider or in `client/.env.production`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Project structure (client)
+
+```text
+client/
+├── app/
+│   ├── _components/          #Shared components like buttons and inputs
+│   ├── _config/
+│   │   ├── config.js           # API base URL (uses NEXT_PUBLIC_API_URL)
+│   │   └── InputFields.js      # Form field configs for quote create/edit
+│   ├── _hooks/
+│   │   ├── useOnClickOutside.js
+│   │   ├── useQuoteActions.js  # Create/update/delete logic via apiClient
+│   │   └── useQuoteSearch.js   # Search/filter logic and state
+│   ├── _utils/                 # Utility functions for fetching data and helper functions
+│   │   └── __tests__/
+│   │       └── queryParams.test.js
+│   └── (routes)/               # Dynamic routes for handling different pages 
+│       ├── globals.css
+│       ├── layout.js
+│       ├── page.js             # Home page
+│       ├── favicon.ico
+│       ├── fonts/              # Custom font files 
+│       ├── quotes/             # Routes related to managing quotes
+│       │   ├── create/         # Create quote
+│       │   └── [id]/           # Quote details
+│       │       └── edit/       # Edit quote
+│       └── search/             # Search quotes        
+├── jest.config.js
+├── jsconfig.json
+├── next-env.d.ts
+├── next.config.mjs
+├── package.json
+├── postcss.config.mjs
+├── tailwind.config.js
+└── README.md
+```
+
+Key files:
+- `app/_config/config.js`: exposes `API_BASE_URL` from `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:3000`).
+- `app/_utils/apiClient.js`: centralized `fetch` wrapper used by client features.
+
+### Tech stack
+
+- Next.js 14, React 18
+- Tailwind CSS
+- React Toastify, React Spinners
+
+### Troubleshooting
+
+- 4xx/5xx responses or toasts on requests: verify `NEXT_PUBLIC_API_URL` and that the API server is running on the expected port.
+- CORS or network errors: confirm API base URL and that the server allows requests from the client origin.
+
+For server setup and database seeding see the root `README.md`.
