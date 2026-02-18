@@ -11,8 +11,14 @@ export const parseCategories = (categoriesStr) =>
     .filter(Boolean)
 
 export const validateLimit = (limit, { min = 1, max = 99 } = {}) => {
-  const num = Number.parseInt(limit, 10) || 9
-  if (!Number.isInteger(num) || num < min || num > max) {
+  const parsed = Number.parseInt(limit, 10)
+  if (Number.isNaN(parsed)) {
+    return 'Limit must be an integer between 1 and 99'
+  }
+
+  const num = parsed === 0 ? 9 : parsed
+
+  if (num < min || num > max) {
     return 'Limit must be an integer between 1 and 99'
   }
 }
